@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROPIO | Dashboard de Cobranza</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  :root {
+    --bg:#0a0e17; --card:#1a2035; --card-h:#1f2847; --brd:#2a3450; --brd-l:#374160;
+    --t1:#e8ecf4; --t2:#8b95a8; --t3:#5b6580;
+    --blue:#3b82f6; --blue-d:rgba(59,130,246,0.15); --green:#10b981; --green-d:rgba(16,185,129,0.12);
+    --red:#ef4444; --red-d:rgba(239,68,68,0.12); --amber:#f59e0b; --purple:#8b5cf6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--t1);line-height:1.5;min-height:100vh}
+
+  .hd{background:linear-gradient(180deg,#111827,#0a0e17);border-bottom:1px solid var(--brd);padding:14px 40px;display:flex;justify-content:space-between;align-items:center}
+  .hd-l{display:flex;align-items:center;gap:14px}
+  .logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#2563eb);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .hd-t{font-size:16px;font-weight:600;letter-spacing:.5px}
+  .hd-st{font-size:10px;color:var(--t2);letter-spacing:1px;text-transform:uppercase}
+  .hd-r{display:flex;align-items:center;gap:18px}
+  .hd-ml{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px}
+  .hd-mv{font-size:12px;color:var(--t2);font-weight:500}
+  .uf-b{background:var(--blue-d);border:1px solid rgba(59,130,246,.3);padding:4px 11px;border-radius:6px;font-size:11px;color:var(--blue);font-weight:600}
+
+  .nav{background:#111827;border-bottom:1px solid var(--brd);padding:0 40px;display:flex;gap:0}
+  .nav-b{padding:13px 24px;font-size:12px;font-weight:600;color:var(--t3);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.5px;font-family:inherit;text-transform:uppercase}
+  .nav-b:hover{color:var(--t2)}
+  .nav-b.on{color:var(--blue);border-bottom-color:var(--blue)}
+
+  .ref-b{margin-left:auto;padding:10px 18px;font-size:11px;font-weight:600;color:var(--t1);background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,.3);border-radius:6px;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.5px;transition:all .2s;display:flex;align-items:center;gap:6px}
+  .ref-b:hover{background:rgba(59,130,246,0.25)}
+  .ref-b.loading{opacity:.6;pointer-events:none}
+  .ref-b .spin{display:none;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--blue);border-radius:50%;animation:sp .6s linear infinite}
+  .ref-b.loading .spin{display:inline-block}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  .wrap{max-width:1440px;margin:0 auto;padding:22px 40px 50px}
+  .vw{display:none}.vw.on{display:block}
+
+  .load-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,14,23,0.85);display:flex;align-items:center;justify-content:center;z-index:200;flex-direction:column;gap:14px}
+  .load-overlay .spin-lg{width:40px;height:40px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--blue);border-radius:50%;animation:sp .7s linear infinite}
+  .load-overlay .load-t{font-size:13px;color:var(--t2);letter-spacing:.5px}
+
+  .kg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+  .kc{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:16px 20px;position:relative;overflow:hidden;transition:border-color .2s}
+  .kc:hover{border-color:var(--brd-l)}
+  .kc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+  .kc.bl::before{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+  .kc.gn::before{background:linear-gradient(135deg,#10b981,#059669)}
+  .kc.rd::before{background:linear-gradient(135deg,#ef4444,#dc2626)}
+  .kc.am::before{background:linear-gradient(135deg,#f59e0b,#d97706)}
+  .kl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px;font-weight:500}
+  .kv{font-size:24px;font-weight:700;letter-spacing:-.5px}
+  .kv.bl{color:var(--blue)}.kv.gn{color:var(--green)}.kv.rd{color:var(--red)}.kv.am{color:var(--amber)}
+  .ks{font-size:11px;color:var(--t2);margin-top:2px}
+  .tg{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
+  .tg-g{background:var(--green-d);color:var(--green)}
+  .tg-r{background:var(--red-d);color:var(--red)}
+  .tg-b{background:var(--blue-d);color:var(--blue)}
+
+  .cg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+  .cc{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:18px 22px}
+  .cc.full{grid-column:1/-1}
+  .ct{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+
+  .dn-wrap{display:flex;align-items:center;gap:32px;padding:20px 0}
+  .dn-cv{position:relative;width:160px;height:160px;flex-shrink:0}
+  .dn-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  .dn-val{font-size:26px;font-weight:700;color:var(--t1)}
+  .dn-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px}
+  .lg{display:flex;flex-direction:column;gap:10px}
+  .lg-i{display:flex;align-items:center;gap:8px}
+  .lg-c{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+  .lg-t{font-size:11px;color:var(--t2)}
+  .lg-v{font-size:12px;font-weight:600;color:var(--t1)}
+
+  .hb{display:flex;flex-direction:column;gap:6px}
+  .hb-r{display:flex;align-items:center;gap:8px}
+  .hb-l{width:110px;font-size:10px;color:var(--t2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+  .hb-t{flex:1;height:18px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden}
+  .hb-f{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px}
+  .hb-v{font-size:9px;font-weight:600;color:rgba(255,255,255,.9);white-space:nowrap}
+  .hb-o{font-size:10px;font-weight:600;color:var(--t2);margin-left:5px;white-space:nowrap}
+
+  .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--brd)}
+  .s-t{font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--t2)}
+  .s-b{font-size:11px;color:var(--t3);font-weight:500}
+
+  .tw{background:var(--card);border:1px solid var(--brd);border-radius:10px;overflow:hidden}
+  .ts{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead th{background:#141b2d;padding:10px 11px;text-align:left;font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--brd);white-space:nowrap;position:sticky;top:0;z-index:2}
+  thead th.r{text-align:right}
+  tbody td{padding:9px 11px;border-bottom:1px solid rgba(42,52,80,.5);white-space:nowrap;font-variant-numeric:tabular-nums}
+  tbody tr{transition:background .15s}
+  tbody tr:hover{background:var(--card-h)}
+  tbody tr.rm{background:rgba(239,68,68,.04)}
+  tbody tr.rm:hover{background:rgba(239,68,68,.08)}
+  td.r{text-align:right}
+  td.nm{font-weight:600;color:var(--t1)}
+  .sb{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600}
+  .sb-ok{background:var(--green-d);color:var(--green)}
+  .sb-mo{background:var(--red-d);color:var(--red)}
+  .sd{width:5px;height:5px;border-radius:50%}
+  .sb-ok .sd{background:var(--green)}
+  .sb-mo .sd{background:var(--red);animation:pu 2s infinite}
+  @keyframes pu{0%,100%{opacity:1}50%{opacity:.4}}
+  .pb{width:68px;height:4px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:4px}
+  .pf{height:100%;border-radius:3px;background:var(--blue)}
+  tbody tr.tr td{background:#141b2d;font-weight:700;color:var(--t1);border-top:2px solid var(--blue);border-bottom:none;padding:11px 11px}
+
+  .fw{position:relative;width:100%;overflow-x:auto;padding-bottom:6px}
+  .fa{min-width:1200px;height:260px;position:relative}
+
+  .tip{position:fixed;background:#1e293b;border:1px solid var(--brd-l);border-radius:8px;padding:8px 12px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:100;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+  .tip.show{opacity:1}
+  .tip-t{font-weight:600;color:var(--t1);margin-bottom:3px}
+  .tip-r{color:var(--t2);display:flex;justify-content:space-between;gap:14px}
+  .tip-v{color:var(--t1);font-weight:500}
+
+  .ft{text-align:center;padding:16px;font-size:10px;color:var(--t3);border-top:1px solid var(--brd);margin-top:16px}
+
+  @media(max-width:1024px){.kg{grid-template-columns:repeat(2,1fr)}.cg{grid-template-columns:1fr}.wrap{padding:16px}.hd,.nav{padding-left:16px;padding-right:16px}}
+  @media(max-width:640px){.kg{grid-template-columns:1fr}.dn-wrap{flex-direction:column;gap:14px}}
+</style>
+</head>
+<body>
+
+<div class="tip" id="tip"></div>
+<div class="load-overlay" id="loader"><div class="spin-lg"></div><div class="load-t">Cargando datos desde Google Sheets...</div></div>
+
+<header class="hd">
+  <div class="hd-l">
+    <div class="logo">P</div>
+    <div><div class="hd-t">PROPIO LATAM</div><div class="hd-st">Dashboard de Cobranza</div></div>
+  </div>
+  <div class="hd-r">
+    <div style="text-align:right"><div class="hd-ml">Fecha de Corte</div><div class="hd-mv" id="hd-fecha">—</div></div>
+    <div class="uf-b" id="hd-uf">UF —</div>
+  </div>
+</header>
+
+<nav class="nav" id="nav">
+  <button class="nav-b on" data-v="status">Status Cartera</button>
+  <button class="nav-b" data-v="avance">Avance Cartera</button>
+  <button class="nav-b" data-v="clientes">Clientes</button>
+  <button class="ref-b" id="btn-ref" onclick="loadData()"><span class="spin"></span>Actualizar</button>
+</nav>
+
+<div class="wrap">
+  <div id="v-status" class="vw on">
+    <div class="kg" id="kpi-g"></div>
+    <div class="cg">
+      <div class="cc" style="min-height:280px">
+        <div class="ct">Estado de la Cartera</div>
+        <div class="dn-wrap">
+          <div class="dn-cv"><canvas id="c-estado" width="160" height="160"></canvas><div class="dn-center"><div class="dn-val" id="dn-pct">—</div><div class="dn-lbl">Al Dia</div></div></div>
+          <div class="lg" id="lg-estado"></div>
+        </div>
+      </div>
+      <div class="cc" style="min-height:280px">
+        <div class="ct">Composicion de Pagos (UF)</div>
+        <div class="dn-wrap">
+          <div class="dn-cv"><canvas id="c-comp" width="160" height="160"></canvas><div class="dn-center"><div class="dn-val" id="dn-tot" style="font-size:20px">—</div><div class="dn-lbl">Total UF</div></div></div>
+          <div class="lg" id="lg-comp"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="v-avance" class="vw">
+    <div class="cg">
+      <div class="cc" style="min-height:340px"><div class="ct">Ranking por Pago Acumulado (UF)</div><div id="ch-rank" class="hb"></div></div>
+      <div class="cc" style="min-height:340px"><div class="ct">Ahorro Acumulado por Cliente (UF)</div><div id="ch-sav" class="hb"></div></div>
+    </div>
+    <div class="cg">
+      <div class="cc full"><div class="ct">Avance de Cuotas por Cliente (%)</div><div id="ch-av" class="hb"></div></div>
+    </div>
+    <div class="cg">
+      <div class="cc full">
+        <div class="ct">Flujo Mensual Programado (UF)</div>
+        <div class="fw"><div class="fa"><canvas id="c-flow"></canvas></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="v-clientes" class="vw">
+    <div class="sh"><div class="s-t">Detalle por Cliente</div><div class="s-b" id="cl-count">—</div></div>
+    <div class="tw"><div class="ts">
+      <table><thead><tr>
+        <th>Cliente</th><th>Estado</th><th>Firma</th><th class="r">Total Pagado (UF)</th><th class="r">Renta (UF)</th><th class="r">Ahorro (UF)</th><th class="r">Mora Vencida (UF)</th><th class="r">Cuotas Impagas</th><th>Avance</th><th class="r">Ultimo Pago</th><th class="r">Dias s/Pago</th><th class="r">Ahorro Acum. (UF)</th>
+      </tr></thead><tbody id="tb"></tbody></table>
+    </div></div>
+  </div>
+</div>
+
+<footer class="ft" id="ft">PROPIO LATAM &mdash; Dashboard de Cobranza</footer>
+
+<script>
+var API_URL='https://script.google.com/macros/s/AKfycbydH16qCum-fFnE7Q87zSIPKQPDpG0ZrkfrKpPZuKbjkjqprPSftmZ4hGpUWvir1OdO/exec';
+var D=null, flowDrawn=false;
+
+function fm(n,d){d=d||2;return n.toLocaleString('es-CL',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function fM(n){return '$'+Math.round(n/1e6).toLocaleString('es-CL')+'M'}
+function fD(s){if(!s)return'\u2014';var p=s.split('-'),m=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];return parseInt(p[2])+' '+m[parseInt(p[1])-1]+' '+p[0]}
+function sT(e,h){var t=document.getElementById('tip');t.innerHTML=h;t.classList.add('show');t.style.left=(e.clientX+12)+'px';t.style.top=(e.clientY-10)+'px';var r=t.getBoundingClientRect();if(r.right>window.innerWidth)t.style.left=(e.clientX-r.width-12)+'px';if(r.bottom>window.innerHeight)t.style.top=(e.clientY-r.height-10)+'px'}
+function hT(){document.getElementById('tip').classList.remove('show')}
+
+// NAV
+document.getElementById('nav').addEventListener('click',function(e){
+  var b=e.target.closest('.nav-b');if(!b)return;
+  var v=b.getAttribute('data-v');if(!v)return;
+  document.querySelectorAll('.vw').forEach(function(el){el.classList.remove('on')});
+  document.querySelectorAll('.nav-b').forEach(function(el){el.classList.remove('on')});
+  document.getElementById('v-'+v).classList.add('on');
+  b.classList.add('on');
+  if(v==='avance'&&!flowDrawn&&D){flowDrawn=true;setTimeout(drawFlow,40)}
+});
+
+// LOAD DATA
+function loadData(){
+  var btn=document.getElementById('btn-ref');
+  var loader=document.getElementById('loader');
+  btn.classList.add('loading');
+  loader.style.display='flex';
+
+  fetch(API_URL)
+    .then(function(r){return r.json()})
+    .then(function(data){
+      if(data.error) throw new Error(data.error);
+      D=data;
+      renderAll();
+      loader.style.display='none';
+      btn.classList.remove('loading');
+    })
+    .catch(function(err){
+      loader.style.display='none';
+      btn.classList.remove('loading');
+      alert('Error cargando datos: '+err.message);
+    });
+}
+
+function renderAll(){
+  if(!D)return;
+  flowDrawn=false;
+
+  // Header
+  var hoy=new Date();
+  var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('hd-fecha').textContent=hoy.getDate()+' '+meses[hoy.getMonth()]+' '+hoy.getFullYear();
+  document.getElementById('hd-uf').textContent='UF $'+fm(D.uf);
+
+  // KPIs
+  var g=document.getElementById('kpi-g');g.innerHTML='';
+  [{l:'Total Clientes',v:D.tc,s:D.ad+' al dia \u00b7 '+D.em+' en mora',c:'bl'},
+   {l:'Total Pagado',v:fm(D.tp)+' UF',s:fM(D.tp*D.uf)+' CLP',c:'gn',tg:'tg-g'},
+   {l:'Mora Vencida',v:fm(D.tm)+' UF',s:D.tmr+'% de cartera',c:'rd',tg:'tg-r'},
+   {l:'Avance Global',v:D.av+'%',s:D.cp+' de '+D.tcu+' cuotas',c:'bl',tg:'tg-b'},
+   {l:'Renta Total Pagada',v:fm(D.tr)+' UF',s:fM(D.tr*D.uf)+' CLP',c:'am'},
+   {l:'Ahorro Pagado',v:fm(D.ta)+' UF',s:fM(D.ta*D.uf)+' CLP',c:'gn'},
+   {l:'Clientes Al Dia',v:((D.ad/D.tc)*100).toFixed(1)+'%',s:D.ad+' de '+D.tc+' clientes',c:'gn',tg:'tg-g'}
+  ].forEach(function(k){
+    var d=document.createElement('div');d.className='kc '+k.c;
+    var sub=k.tg?'<span class="tg '+k.tg+'">'+k.s+'</span>':k.s;
+    d.innerHTML='<div class="kl">'+k.l+'</div><div class="kv '+k.c+'">'+k.v+'</div><div class="ks">'+sub+'</div>';
+    g.appendChild(d);
+  });
+
+  // Donuts
+  document.getElementById('dn-pct').textContent=((D.ad/D.tc)*100).toFixed(1)+'%';
+  document.getElementById('dn-tot').textContent=fm(D.tp,0);
+  document.getElementById('lg-estado').innerHTML='';
+  document.getElementById('lg-comp').innerHTML='';
+  donut('c-estado','lg-estado',[{v:D.ad,c:'#10b981',l:'Al Dia',vl:D.ad+' clientes'},{v:D.em,c:'#ef4444',l:'En Mora',vl:D.em+' clientes'}]);
+  donut('c-comp','lg-comp',[{v:D.tr,c:'#3b82f6',l:'Renta Total Pagada',vl:fm(D.tr)+' UF'},{v:D.ta,c:'#8b5cf6',l:'Ahorros Totales',vl:fm(D.ta)+' UF'},{v:D.tm,c:'#ef4444',l:'Mora',vl:fm(D.tm)+' UF'}]);
+
+  // HBars
+  document.getElementById('ch-rank').innerHTML='';
+  document.getElementById('ch-sav').innerHTML='';
+  document.getElementById('ch-av').innerHTML='';
+  var rs=D.cl.slice().sort(function(a,b){return b.t-a.t});
+  hbar('ch-rank',rs.map(function(c){return{n:c.n,v:c.t,lb:fm(c.t),e:c.e}}),function(it){return it.e?'#3b82f6':'#ef4444'});
+  var ss=D.cl.filter(function(c){return c.aa>0}).sort(function(a,b){return b.aa-a.aa});
+  hbar('ch-sav',ss.map(function(c){return{n:c.n,v:c.aa,lb:fm(c.aa)}}),'#8b5cf6');
+  var avs=D.cl.slice().sort(function(a,b){return b.av-a.av});
+  hbar('ch-av',avs.map(function(c){return{n:c.n,v:c.av,lb:c.av.toFixed(1)+'%',ex:c.p+'/'+c.tc,e:c.e}}),function(it){return it.e?'#10b981':'#ef4444'});
+
+  // Table
+  document.getElementById('cl-count').textContent=D.tc+' clientes activos';
+  var bd=document.getElementById('tb');bd.innerHTML='';
+  var so=D.cl.slice().sort(function(a,b){if(a.e!==b.e)return a.e?1:-1;return b.t-a.t});
+  so.forEach(function(c){
+    var tr=document.createElement('tr');
+    if(!c.e)tr.className='rm';
+    var sc=c.e?'sb-ok':'sb-mo',el=c.e?'Al dia':'En mora';
+    var dc=c.ds>30?'color:var(--red)':c.ds>14?'color:var(--amber)':'';
+    tr.innerHTML=
+      '<td class="nm">'+c.n+'</td>'+
+      '<td><span class="sb '+sc+'"><span class="sd"></span>'+el+'</span></td>'+
+      '<td>'+fD(c.f)+'</td>'+
+      '<td class="r">'+fm(c.t)+'</td>'+
+      '<td class="r">'+fm(c.r)+'</td>'+
+      '<td class="r">'+fm(c.a)+'</td>'+
+      '<td class="r" style="'+(c.m>0?'color:var(--red);font-weight:600':'')+'">'+(c.m>0?fm(c.m):'\u2014')+'</td>'+
+      '<td class="r" style="'+(c.ci>0?'color:var(--red);font-weight:600':'')+'">'+(c.ci||'\u2014')+'</td>'+
+      '<td><div class="pb"><div class="pf" style="width:'+c.av+'%"></div></div><span style="font-size:10px">'+c.av.toFixed(1)+'%</span></td>'+
+      '<td class="r">'+fD(c.up)+'</td>'+
+      '<td class="r" style="'+dc+';font-weight:'+(c.ds>14?'600':'400')+'">'+c.ds+'</td>'+
+      '<td class="r">'+fm(c.aa)+'</td>';
+    bd.appendChild(tr);
+  });
+  var tci=D.cl.reduce(function(a,c){return a+c.ci},0);
+  var ttr=document.createElement('tr');ttr.className='tr';
+  ttr.innerHTML='<td>TOTAL CARTERA</td><td></td><td></td><td class="r">'+fm(D.tp)+'</td><td class="r">'+fm(D.tr)+'</td><td class="r">'+fm(D.ta)+'</td><td class="r" style="color:var(--red)">'+fm(D.tm)+'</td><td class="r">'+tci+'</td><td><div class="pb"><div class="pf" style="width:'+D.av+'%"></div></div><span style="font-size:10px">'+D.av+'%</span></td><td></td><td></td><td class="r">'+fm(D.taa)+'</td>';
+  bd.appendChild(ttr);
+
+  // Footer
+  document.getElementById('ft').innerHTML='PROPIO LATAM &mdash; Dashboard de Cobranza &middot; Actualizado: '+hoy.toLocaleString('es-CL')+' &middot; Fuente: Google Sheets';
+
+  // If avance tab is showing, draw flow
+  if(document.getElementById('v-avance').classList.contains('on')){flowDrawn=true;setTimeout(drawFlow,40)}
+}
+
+function donut(cid,lid,segs){
+  var cv=document.getElementById(cid),cx=cv.getContext('2d'),dp=window.devicePixelRatio||1;
+  cv.width=160*dp;cv.height=160*dp;cv.style.width='160px';cv.style.height='160px';cx.scale(dp,dp);
+  var tot=segs.reduce(function(a,s){return a+s.v},0),gap=0.04,st=-Math.PI/2;
+  segs.forEach(function(s){
+    var an=Math.max((s.v/tot)*Math.PI*2-gap,0.01);
+    cx.beginPath();cx.arc(80,80,64,st,st+an);cx.strokeStyle=s.c;cx.lineWidth=20;cx.lineCap='butt';cx.stroke();
+    st+=an+gap;
+  });
+  var lg=document.getElementById(lid);
+  segs.forEach(function(s){
+    var pc=((s.v/tot)*100).toFixed(1);
+    lg.innerHTML+='<div class="lg-i"><div class="lg-c" style="background:'+s.c+'"></div><div><div class="lg-t">'+s.l+'</div><div class="lg-v">'+s.vl+' ('+pc+'%)</div></div></div>';
+  });
+}
+
+function hbar(id,items,cfn){
+  var c=document.getElementById(id),mx=items[0]?items[0].v:1;
+  items.forEach(function(it){
+    var pc=(it.v/mx)*100,co=typeof cfn==='function'?cfn(it):cfn;
+    var ex=it.ex?'<span class="hb-o">'+it.ex+'</span>':'';
+    c.innerHTML+='<div class="hb-r"><div class="hb-l">'+it.n+'</div><div class="hb-t"><div class="hb-f" style="width:'+pc+'%;background:'+co+'"><span class="hb-v">'+it.lb+'</span></div></div>'+ex+'</div>';
+  });
+}
+
+function drawFlow(){
+  var cv=document.getElementById('c-flow');if(!cv||!D)return;
+  var ar=cv.parentElement,cx=cv.getContext('2d'),dp=window.devicePixelRatio||1;
+  var W=Math.max(ar.clientWidth,1200),H=240;
+  cv.width=W*dp;cv.height=H*dp;cv.style.width=W+'px';cv.style.height=H+'px';cx.scale(dp,dp);
+
+  var data=D.mo,n=data.length,lp=44,rp=14,tp=16,bp=36;
+  var cW=W-lp-rp,cH=H-tp-bp;
+  var bW=Math.floor(cW/n)-2,gap=2,tbW=bW+gap;
+  var mx=0;data.forEach(function(d){if(d.u>mx)mx=d.u});
+  mx=Math.ceil(mx/10)*10;
+
+  cx.textAlign='right';cx.textBaseline='middle';
+  for(var i=0;i<=4;i++){
+    var y=tp+(cH/4)*i;
+    cx.strokeStyle='rgba(255,255,255,.06)';cx.lineWidth=1;
+    cx.beginPath();cx.moveTo(lp,y);cx.lineTo(W-rp,y);cx.stroke();
+    cx.fillStyle='#5b6580';cx.font='10px Inter,sans-serif';
+    cx.fillText(Math.round(mx-(mx/4)*i),lp-6,y);
+  }
+  cx.strokeStyle='rgba(255,255,255,.1)';cx.lineWidth=1;
+  cx.beginPath();cx.moveTo(lp,tp+cH);cx.lineTo(W-rp,tp+cH);cx.stroke();
+
+  data.forEach(function(d,i){
+    var x=lp+i*tbW,h=(d.u/mx)*cH,y=tp+cH-h;
+    cx.fillStyle='rgba(59,130,246,0.5)';
+    cx.beginPath();
+    if(cx.roundRect)cx.roundRect(x,y,bW,h,[2,2,0,0]);else cx.rect(x,y,bW,h);
+    cx.fill();
+  });
+
+  // HOY line - dynamic from API
+  var hi=D.hi||0,hx=lp+hi*tbW+bW/2;
+  cx.strokeStyle='#f59e0b';cx.lineWidth=2;cx.setLineDash([5,3]);
+  cx.beginPath();cx.moveTo(hx,tp);cx.lineTo(hx,tp+cH);cx.stroke();
+  cx.setLineDash([]);
+  cx.fillStyle='#f59e0b';cx.font='bold 10px Inter,sans-serif';cx.textAlign='center';
+  cx.fillText('HOY',hx,tp-5);
+
+  cx.fillStyle='#5b6580';cx.font='9px Inter,sans-serif';cx.textAlign='center';cx.textBaseline='top';
+  data.forEach(function(d,i){
+    if(i%3===0){
+      var x=lp+i*tbW+bW/2;
+      cx.save();cx.translate(x,tp+cH+5);cx.rotate(-0.45);cx.fillText(d.d,0,0);cx.restore();
+    }
+  });
+
+  cv.onmousemove=function(ev){
+    var rc=cv.getBoundingClientRect(),mx2=(ev.clientX-rc.left)*(cv.width/dp/rc.width);
+    var idx=Math.floor((mx2-lp)/tbW);
+    if(idx>=0&&idx<n){
+      var dd=data[idx];
+      sT(ev,'<div class="tip-t">'+dd.d+'</div><div class="tip-r"><span>Cuota programada</span><span class="tip-v">'+fm(dd.u)+' UF</span></div>');
+    }else hT();
+  };
+  cv.onmouseleave=hT;
+}
+
+// Initial load
+loadData();
+</script>
+</body>
+</html>
