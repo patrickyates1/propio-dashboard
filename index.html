@@ -30,7 +30,7 @@
   .nav-b:hover{color:var(--t2)}
   .nav-b.on{color:var(--blue);border-bottom-color:var(--blue)}
 
-  .ref-b{margin-left:auto;padding:10px 18px;font-size:11px;font-weight:600;color:var(--t1);background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,.3);border-radius:6px;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.5px;transition:all .2s;display:flex;align-items:center;gap:6px}
+  .ref-b{padding:10px 18px;font-size:11px;font-weight:600;color:var(--t1);background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,.3);border-radius:6px;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.5px;transition:all .2s;display:flex;align-items:center;gap:6px}
   .ref-b:hover{background:rgba(59,130,246,0.25)}
   .ref-b.loading{opacity:.6;pointer-events:none}
   .ref-b .spin{display:none;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--blue);border-radius:50%;animation:sp .6s linear infinite}
@@ -147,6 +147,7 @@
   <button class="nav-b on" data-v="status">Status Cartera</button>
   <button class="nav-b" data-v="avance">Avance Cartera</button>
   <button class="nav-b" data-v="clientes">Clientes</button>
+  <span id="countdown" style="font-size:10px;color:#5b6580;margin-left:auto;letter-spacing:.5px"></span>
   <button class="ref-b" id="btn-ref" onclick="loadData()"><span class="spin"></span>Actualizar</button>
 </nav>
 
@@ -202,6 +203,8 @@
 <script>
 var API_URL='https://script.google.com/macros/s/AKfycbydH16qCum-fFnE7Q87zSIPKQPDpG0ZrkfrKpPZuKbjkjqprPSftmZ4hGpUWvir1OdO/exec';
 var D=null, flowDrawn=false;
+var AUTO_REFRESH_MIN=5;
+var refreshTimer=null, countdown=AUTO_REFRESH_MIN*60;
 
 function fm(n,d){d=d||2;return n.toLocaleString('es-CL',{minimumFractionDigits:d,maximumFractionDigits:d})}
 function fM(n){return '$'+Math.round(n/1e6).toLocaleString('es-CL')+'M'}
@@ -406,6 +409,23 @@ function drawFlow(){
   };
   cv.onmouseleave=hT;
 }
+
+// Auto-refresh countdown
+function startCountdown(){
+  countdown=AUTO_REFRESH_MIN*60;
+  if(refreshTimer)clearInterval(refreshTimer);
+  refreshTimer=setInterval(function(){
+    countdown--;
+    var m=Math.floor(countdown/60),s=countdown%60;
+    var ct=document.getElementById('countdown');
+    if(ct)ct.textContent='Auto-refresh en '+m+':'+(s<10?'0':'')+s;
+    if(countdown<=0){loadData();countdown=AUTO_REFRESH_MIN*60;}
+  },1000);
+}
+
+// Wrap loadData to reset countdown
+var _origLoad=loadData;
+loadData=function(){_origLoad();startCountdown()};
 
 // Initial load
 loadData();
