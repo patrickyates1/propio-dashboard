@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -44,8 +44,8 @@
   .load-overlay .spin-lg{width:40px;height:40px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--blue);border-radius:50%;animation:sp .7s linear infinite}
   .load-overlay .load-t{font-size:13px;color:var(--t2);letter-spacing:.5px}
 
-  .kg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
-  .kc{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:16px 20px;position:relative;overflow:hidden;transition:border-color .2s}
+  .kg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .kc{background:var(--card);border:1px solid var(--brd);border-radius:10px;padding:18px 24px;min-width:0;position:relative;overflow:hidden;transition:border-color .2s}
   .kc:hover{border-color:var(--brd-l)}
   .kc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
   .kc.bl::before{background:linear-gradient(135deg,#3b82f6,#2563eb)}
@@ -53,7 +53,7 @@
   .kc.rd::before{background:linear-gradient(135deg,#ef4444,#dc2626)}
   .kc.am::before{background:linear-gradient(135deg,#f59e0b,#d97706)}
   .kl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px;font-weight:500}
-  .kv{font-size:24px;font-weight:700;letter-spacing:-.5px}
+  .kv{font-size:20px;font-weight:700;letter-spacing:-.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .kv.bl{color:var(--blue)}.kv.gn{color:var(--green)}.kv.rd{color:var(--red)}.kv.am{color:var(--amber)}
   .ks{font-size:11px;color:var(--t2);margin-top:2px}
   .tg{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
@@ -112,9 +112,6 @@
   .pf{height:100%;border-radius:3px;background:var(--blue)}
   tbody tr.tr td{background:#141b2d;font-weight:700;color:var(--t1);border-top:2px solid var(--blue);border-bottom:none;padding:11px 11px}
 
-  .fw{position:relative;width:100%;overflow-x:auto;padding-bottom:6px}
-  .fa{min-width:1200px;height:260px;position:relative}
-
   .tip{position:fixed;background:#1e293b;border:1px solid var(--brd-l);border-radius:8px;padding:8px 12px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:100;box-shadow:0 8px 20px rgba(0,0,0,.4)}
   .tip.show{opacity:1}
   .tip-t{font-weight:600;color:var(--t1);margin-bottom:3px}
@@ -123,7 +120,8 @@
 
   .ft{text-align:center;padding:16px;font-size:10px;color:var(--t3);border-top:1px solid var(--brd);margin-top:16px}
 
-  @media(max-width:1024px){.kg{grid-template-columns:repeat(2,1fr)}.cg{grid-template-columns:1fr}.wrap{padding:16px}.hd,.nav{padding-left:16px;padding-right:16px}}
+  @media(max-width:1200px){.kg{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:1024px){.cg{grid-template-columns:1fr}.wrap{padding:16px}.hd,.nav{padding-left:16px;padding-right:16px}}
   @media(max-width:640px){.kg{grid-template-columns:1fr}.dn-wrap{flex-direction:column;gap:14px}}
 </style>
 </head>
@@ -180,12 +178,6 @@
     <div class="cg">
       <div class="cc full"><div class="ct">Avance de Cuotas por Cliente (%)</div><div id="ch-av" class="hb"></div></div>
     </div>
-    <div class="cg">
-      <div class="cc full">
-        <div class="ct">Flujo Mensual Programado (UF)</div>
-        <div class="fw"><div class="fa"><canvas id="c-flow"></canvas></div></div>
-      </div>
-    </div>
   </div>
 
   <div id="v-clientes" class="vw">
@@ -202,7 +194,7 @@
 
 <script>
 var API_URL='https://script.google.com/macros/s/AKfycbydH16qCum-fFnE7Q87zSIPKQPDpG0ZrkfrKpPZuKbjkjqprPSftmZ4hGpUWvir1OdO/exec';
-var D=null, flowDrawn=false;
+var D=null;
 var AUTO_REFRESH_MIN=5;
 var refreshTimer=null, countdown=AUTO_REFRESH_MIN*60;
 
@@ -220,7 +212,6 @@ document.getElementById('nav').addEventListener('click',function(e){
   document.querySelectorAll('.nav-b').forEach(function(el){el.classList.remove('on')});
   document.getElementById('v-'+v).classList.add('on');
   b.classList.add('on');
-  if(v==='avance'&&!flowDrawn&&D){flowDrawn=true;setTimeout(drawFlow,40)}
 });
 
 // LOAD DATA
@@ -248,8 +239,6 @@ function loadData(){
 
 function renderAll(){
   if(!D)return;
-  flowDrawn=false;
-
   // Header
   var hoy=new Date();
   var meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -265,7 +254,7 @@ function renderAll(){
    {l:'Renta Total Pagada',v:fm(D.tr)+' UF',s:fM(D.tr*D.uf)+' CLP',c:'am'},
    {l:'Ahorro Pagado',v:fm(D.ta)+' UF',s:fM(D.ta*D.uf)+' CLP',c:'gn'},
    {l:'Clientes Al Dia',v:((D.ad/D.tc)*100).toFixed(1)+'%',s:D.ad+' de '+D.tc+' clientes',c:'gn',tg:'tg-g'},
-   {l:'Flujo Mensual Total',v:(D.mo&&D.mo[D.hi]?fm(D.mo[D.hi].u):'—')+' UF',s:'Cuota programada mes actual',c:'bl'}
+   {l:'Flujo Mensual Total',v:(D.fm?fm(D.fm):'—')+' UF',s:'Cuota programada mes actual',c:'bl'}
   ].forEach(function(k){
     var d=document.createElement('div');d.className='kc '+k.c;
     var sub=k.tg?'<span class="tg '+k.tg+'">'+k.s+'</span>':k.s;
@@ -287,7 +276,7 @@ function renderAll(){
   document.getElementById('ch-av').innerHTML='';
   var rs=D.cl.slice().sort(function(a,b){return b.t-a.t});
   hbar('ch-rank',rs.map(function(c){return{n:c.n,v:c.t,lb:fm(c.t),e:c.e}}),function(it){return it.e?'#3b82f6':'#ef4444'});
-  var ss=D.cl.filter(function(c){return c.a>=0.01}).sort(function(a,b){return b.a-a.a});
+  var ss=D.cl.slice().sort(function(a,b){return b.a-a.a});
   hbar('ch-sav',ss.map(function(c){return{n:c.n,v:c.a,lb:fm(c.a)}}),'#8b5cf6');
   var avs=D.cl.slice().sort(function(a,b){return b.av-a.av});
   hbar('ch-av',avs.map(function(c){return{n:c.n,v:c.av,lb:c.av.toFixed(1)+'%',ex:c.p+'/'+c.tc,e:c.e}}),function(it){return it.e?'#10b981':'#ef4444'});
@@ -321,8 +310,6 @@ function renderAll(){
   // Footer
   document.getElementById('ft').innerHTML='PROPIO LATAM &mdash; Dashboard de Cobranza &middot; Actualizado: '+hoy.toLocaleString('es-CL')+' &middot; Fuente: Google Sheets';
 
-  // If avance tab is showing, draw flow
-  if(document.getElementById('v-avance').classList.contains('on')){flowDrawn=true;setTimeout(drawFlow,40)}
 }
 
 function donut(cid,lid,segs){
@@ -350,64 +337,6 @@ function hbar(id,items,cfn){
   });
 }
 
-function drawFlow(){
-  var cv=document.getElementById('c-flow');if(!cv||!D)return;
-  var ar=cv.parentElement,cx=cv.getContext('2d'),dp=window.devicePixelRatio||1;
-  var W=Math.max(ar.clientWidth,1200),H=240;
-  cv.width=W*dp;cv.height=H*dp;cv.style.width=W+'px';cv.style.height=H+'px';cx.scale(dp,dp);
-
-  var data=D.mo,n=data.length,lp=44,rp=14,tp=16,bp=36;
-  var cW=W-lp-rp,cH=H-tp-bp;
-  var bW=Math.floor(cW/n)-2,gap=2,tbW=bW+gap;
-  var mx=0;data.forEach(function(d){if(d.u>mx)mx=d.u});
-  mx=Math.ceil(mx/10)*10;
-
-  cx.textAlign='right';cx.textBaseline='middle';
-  for(var i=0;i<=4;i++){
-    var y=tp+(cH/4)*i;
-    cx.strokeStyle='rgba(255,255,255,.06)';cx.lineWidth=1;
-    cx.beginPath();cx.moveTo(lp,y);cx.lineTo(W-rp,y);cx.stroke();
-    cx.fillStyle='#5b6580';cx.font='10px Inter,sans-serif';
-    cx.fillText(Math.round(mx-(mx/4)*i),lp-6,y);
-  }
-  cx.strokeStyle='rgba(255,255,255,.1)';cx.lineWidth=1;
-  cx.beginPath();cx.moveTo(lp,tp+cH);cx.lineTo(W-rp,tp+cH);cx.stroke();
-
-  data.forEach(function(d,i){
-    var x=lp+i*tbW,h=(d.u/mx)*cH,y=tp+cH-h;
-    cx.fillStyle='rgba(59,130,246,0.5)';
-    cx.beginPath();
-    if(cx.roundRect)cx.roundRect(x,y,bW,h,[2,2,0,0]);else cx.rect(x,y,bW,h);
-    cx.fill();
-  });
-
-  // HOY line - dynamic from API
-  var hi=D.hi||0,hx=lp+hi*tbW+bW/2;
-  cx.strokeStyle='#f59e0b';cx.lineWidth=2;cx.setLineDash([5,3]);
-  cx.beginPath();cx.moveTo(hx,tp);cx.lineTo(hx,tp+cH);cx.stroke();
-  cx.setLineDash([]);
-  cx.fillStyle='#f59e0b';cx.font='bold 10px Inter,sans-serif';cx.textAlign='center';
-  cx.fillText('HOY',hx,tp-5);
-
-  cx.fillStyle='#5b6580';cx.font='9px Inter,sans-serif';cx.textAlign='center';cx.textBaseline='top';
-  data.forEach(function(d,i){
-    if(i%3===0){
-      var x=lp+i*tbW+bW/2;
-      cx.save();cx.translate(x,tp+cH+5);cx.rotate(-0.45);cx.fillText(d.d,0,0);cx.restore();
-    }
-  });
-
-  cv.onmousemove=function(ev){
-    var rc=cv.getBoundingClientRect(),mx2=(ev.clientX-rc.left)*(cv.width/dp/rc.width);
-    var idx=Math.floor((mx2-lp)/tbW);
-    if(idx>=0&&idx<n){
-      var dd=data[idx];
-      sT(ev,'<div class="tip-t">'+dd.d+'</div><div class="tip-r"><span>Cuota programada</span><span class="tip-v">'+fm(dd.u)+' UF</span></div>');
-    }else hT();
-  };
-  cv.onmouseleave=hT;
-}
-
 // Auto-refresh countdown
 function startCountdown(){
   countdown=AUTO_REFRESH_MIN*60;
@@ -426,7 +355,3 @@ var _origLoad=loadData;
 loadData=function(){_origLoad();startCountdown()};
 
 // Initial load
-loadData();
-</script>
-</body>
-</html>
