@@ -147,8 +147,8 @@
   <button class="nav-b on" data-v="status">Status Cartera</button>
   <button class="nav-b" data-v="avance">Avance Cartera</button>
   <button class="nav-b" data-v="clientes">Clientes</button>
-  <span id="countdown" style="font-size:10px;color:#5b6580;margin-left:auto;letter-spacing:.5px"></span>
-  <button class="ref-b" id="btn-ref" onclick="loadData()"><span class="spin"></span>Actualizar</button>
+  <span id="countdown" style="font-size:10px;color:#5b6580;margin-left:auto;margin-right:20px;letter-spacing:.5px"></span>
+  <button class="ref-b" id="btn-ref" style="margin-right:12px" onclick="loadData()"><span class="spin"></span>Actualizar</button>
 </nav>
 
 <div class="wrap">
@@ -192,7 +192,7 @@
     <div class="sh"><div class="s-t">Detalle por Cliente</div><div class="s-b" id="cl-count">—</div></div>
     <div class="tw"><div class="ts">
       <table><thead><tr>
-        <th>Cliente</th><th>Estado</th><th>Firma</th><th class="r">Total Pagado (UF)</th><th class="r">Renta (UF)</th><th class="r">Ahorro (UF)</th><th class="r">Mora Vencida (UF)</th><th class="r">Cuotas Impagas</th><th>Avance</th><th class="r">Ultimo Pago</th><th class="r">Dias s/Pago</th><th class="r">Ahorro Acum. (UF)</th>
+        <th>Cliente</th><th>Estado</th><th>Firma</th><th class="r">Total Pagado (UF)</th><th class="r">Renta (UF)</th><th class="r">Ahorro (UF)</th><th class="r">Mora Vencida (UF)</th><th class="r">Cuotas Impagas</th><th>Avance</th><th class="r">Ahorro Acum. (UF)</th>
       </tr></thead><tbody id="tb"></tbody></table>
     </div></div>
   </div>
@@ -264,7 +264,8 @@ function renderAll(){
    {l:'Avance Global',v:D.av+'%',s:D.cp+' de '+D.tcu+' cuotas',c:'bl',tg:'tg-b'},
    {l:'Renta Total Pagada',v:fm(D.tr)+' UF',s:fM(D.tr*D.uf)+' CLP',c:'am'},
    {l:'Ahorro Pagado',v:fm(D.ta)+' UF',s:fM(D.ta*D.uf)+' CLP',c:'gn'},
-   {l:'Clientes Al Dia',v:((D.ad/D.tc)*100).toFixed(1)+'%',s:D.ad+' de '+D.tc+' clientes',c:'gn',tg:'tg-g'}
+   {l:'Clientes Al Dia',v:((D.ad/D.tc)*100).toFixed(1)+'%',s:D.ad+' de '+D.tc+' clientes',c:'gn',tg:'tg-g'},
+   {l:'Flujo Mensual Total',v:(D.mo&&D.mo[D.hi]?fm(D.mo[D.hi].u):'—')+' UF',s:'Cuota programada mes actual',c:'bl'}
   ].forEach(function(k){
     var d=document.createElement('div');d.className='kc '+k.c;
     var sub=k.tg?'<span class="tg '+k.tg+'">'+k.s+'</span>':k.s;
@@ -286,8 +287,8 @@ function renderAll(){
   document.getElementById('ch-av').innerHTML='';
   var rs=D.cl.slice().sort(function(a,b){return b.t-a.t});
   hbar('ch-rank',rs.map(function(c){return{n:c.n,v:c.t,lb:fm(c.t),e:c.e}}),function(it){return it.e?'#3b82f6':'#ef4444'});
-  var ss=D.cl.filter(function(c){return c.aa>0}).sort(function(a,b){return b.aa-a.aa});
-  hbar('ch-sav',ss.map(function(c){return{n:c.n,v:c.aa,lb:fm(c.aa)}}),'#8b5cf6');
+  var ss=D.cl.filter(function(c){return c.a>0}).sort(function(a,b){return b.a-a.a});
+  hbar('ch-sav',ss.map(function(c){return{n:c.n,v:c.a,lb:fm(c.a)}}),'#8b5cf6');
   var avs=D.cl.slice().sort(function(a,b){return b.av-a.av});
   hbar('ch-av',avs.map(function(c){return{n:c.n,v:c.av,lb:c.av.toFixed(1)+'%',ex:c.p+'/'+c.tc,e:c.e}}),function(it){return it.e?'#10b981':'#ef4444'});
 
@@ -299,7 +300,6 @@ function renderAll(){
     var tr=document.createElement('tr');
     if(!c.e)tr.className='rm';
     var sc=c.e?'sb-ok':'sb-mo',el=c.e?'Al dia':'En mora';
-    var dc=c.ds>30?'color:var(--red)':c.ds>14?'color:var(--amber)':'';
     tr.innerHTML=
       '<td class="nm">'+c.n+'</td>'+
       '<td><span class="sb '+sc+'"><span class="sd"></span>'+el+'</span></td>'+
@@ -310,14 +310,12 @@ function renderAll(){
       '<td class="r" style="'+(c.m>0?'color:var(--red);font-weight:600':'')+'">'+(c.m>0?fm(c.m):'\u2014')+'</td>'+
       '<td class="r" style="'+(c.ci>0?'color:var(--red);font-weight:600':'')+'">'+(c.ci||'\u2014')+'</td>'+
       '<td><div class="pb"><div class="pf" style="width:'+c.av+'%"></div></div><span style="font-size:10px">'+c.av.toFixed(1)+'%</span></td>'+
-      '<td class="r">'+fD(c.up)+'</td>'+
-      '<td class="r" style="'+dc+';font-weight:'+(c.ds>14?'600':'400')+'">'+c.ds+'</td>'+
       '<td class="r">'+fm(c.aa)+'</td>';
     bd.appendChild(tr);
   });
   var tci=D.cl.reduce(function(a,c){return a+c.ci},0);
   var ttr=document.createElement('tr');ttr.className='tr';
-  ttr.innerHTML='<td>TOTAL CARTERA</td><td></td><td></td><td class="r">'+fm(D.tp)+'</td><td class="r">'+fm(D.tr)+'</td><td class="r">'+fm(D.ta)+'</td><td class="r" style="color:var(--red)">'+fm(D.tm)+'</td><td class="r">'+tci+'</td><td><div class="pb"><div class="pf" style="width:'+D.av+'%"></div></div><span style="font-size:10px">'+D.av+'%</span></td><td></td><td></td><td class="r">'+fm(D.taa)+'</td>';
+  ttr.innerHTML='<td>TOTAL CARTERA</td><td></td><td></td><td class="r">'+fm(D.tp)+'</td><td class="r">'+fm(D.tr)+'</td><td class="r">'+fm(D.ta)+'</td><td class="r" style="color:var(--red)">'+fm(D.tm)+'</td><td class="r">'+tci+'</td><td><div class="pb"><div class="pf" style="width:'+D.av+'%"></div></div><span style="font-size:10px">'+D.av+'%</span></td><td class="r">'+fm(D.taa)+'</td>';
   bd.appendChild(ttr);
 
   // Footer
@@ -348,7 +346,10 @@ function hbar(id,items,cfn){
   items.forEach(function(it){
     var pc=(it.v/mx)*100,co=typeof cfn==='function'?cfn(it):cfn;
     var ex=it.ex?'<span class="hb-o">'+it.ex+'</span>':'';
-    c.innerHTML+='<div class="hb-r"><div class="hb-l">'+it.n+'</div><div class="hb-t"><div class="hb-f" style="width:'+pc+'%;background:'+co+'"><span class="hb-v">'+it.lb+'</span></div></div>'+ex+'</div>';
+    var inside=pc>15;
+    var valHtml=inside?'<span class="hb-v">'+it.lb+'</span>':'';
+    var outHtml=inside?'':'<span class="hb-o" style="color:var(--t1)">'+it.lb+'</span>';
+    c.innerHTML+='<div class="hb-r"><div class="hb-l">'+it.n+'</div><div class="hb-t"><div class="hb-f" style="width:'+pc+'%;background:'+co+'">'+valHtml+'</div></div>'+outHtml+ex+'</div>';
   });
 }
 
