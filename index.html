@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -80,9 +80,9 @@
   .hb{display:flex;flex-direction:column;gap:6px}
   .hb-r{display:flex;align-items:center;gap:8px}
   .hb-l{width:110px;font-size:10px;color:var(--t2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
-  .hb-t{flex:1;height:18px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden}
-  .hb-f{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px}
-  .hb-v{font-size:9px;font-weight:600;color:rgba(255,255,255,.9);white-space:nowrap}
+  .hb-t{flex:1;height:18px;background:rgba(255,255,255,.04);border-radius:4px;position:relative;overflow:visible}
+  .hb-f{height:100%;border-radius:4px;position:relative}
+  .hb-v{position:absolute;right:-4px;top:50%;transform:translate(100%,-50%);font-size:9px;font-weight:600;color:var(--t1);white-space:nowrap;padding-left:4px}
   .hb-o{font-size:10px;font-weight:600;color:var(--t2);margin-left:5px;white-space:nowrap}
 
   .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--brd)}
@@ -287,7 +287,7 @@ function renderAll(){
   document.getElementById('ch-av').innerHTML='';
   var rs=D.cl.slice().sort(function(a,b){return b.t-a.t});
   hbar('ch-rank',rs.map(function(c){return{n:c.n,v:c.t,lb:fm(c.t),e:c.e}}),function(it){return it.e?'#3b82f6':'#ef4444'});
-  var ss=D.cl.filter(function(c){return c.a>0}).sort(function(a,b){return b.a-a.a});
+  var ss=D.cl.filter(function(c){return c.a>=0.01}).sort(function(a,b){return b.a-a.a});
   hbar('ch-sav',ss.map(function(c){return{n:c.n,v:c.a,lb:fm(c.a)}}),'#8b5cf6');
   var avs=D.cl.slice().sort(function(a,b){return b.av-a.av});
   hbar('ch-av',avs.map(function(c){return{n:c.n,v:c.av,lb:c.av.toFixed(1)+'%',ex:c.p+'/'+c.tc,e:c.e}}),function(it){return it.e?'#10b981':'#ef4444'});
@@ -346,10 +346,7 @@ function hbar(id,items,cfn){
   items.forEach(function(it){
     var pc=(it.v/mx)*100,co=typeof cfn==='function'?cfn(it):cfn;
     var ex=it.ex?'<span class="hb-o">'+it.ex+'</span>':'';
-    var inside=pc>15;
-    var valHtml=inside?'<span class="hb-v">'+it.lb+'</span>':'';
-    var outHtml=inside?'':'<span class="hb-o" style="color:var(--t1)">'+it.lb+'</span>';
-    c.innerHTML+='<div class="hb-r"><div class="hb-l">'+it.n+'</div><div class="hb-t"><div class="hb-f" style="width:'+pc+'%;background:'+co+'">'+valHtml+'</div></div>'+outHtml+ex+'</div>';
+    c.innerHTML+='<div class="hb-r"><div class="hb-l">'+it.n+'</div><div class="hb-t"><div class="hb-f" style="width:'+pc+'%;background:'+co+'"><span class="hb-v">'+it.lb+'</span></div></div>'+ex+'</div>';
   });
 }
 
