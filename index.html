@@ -80,10 +80,10 @@
   .hb{display:flex;flex-direction:column;gap:6px}
   .hb-r{display:flex;align-items:center;gap:8px}
   .hb-l{width:110px;font-size:10px;color:var(--t2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
-  .hb-t{flex:1;height:18px;background:rgba(255,255,255,.04);border-radius:4px;position:relative;overflow:visible}
-  .hb-f{height:100%;border-radius:4px;position:relative}
-  .hb-v{position:absolute;right:-4px;top:50%;transform:translate(100%,-50%);font-size:9px;font-weight:600;color:var(--t1);white-space:nowrap;padding-left:5px}
-  .hb-o{font-size:9px;font-weight:600;color:var(--t2);margin-left:8px;white-space:nowrap;flex-shrink:0}
+  .hb-t{flex:1;height:18px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden}
+  .hb-f{height:100%;border-radius:4px}
+  .hb-val{font-size:9px;font-weight:600;color:var(--t1);white-space:nowrap;flex-shrink:0;min-width:52px;text-align:right}
+  .hb-o{font-size:9px;font-weight:600;color:var(--t2);white-space:nowrap;flex-shrink:0;min-width:40px;text-align:right}
 
   .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--brd)}
   .s-t{font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--t2)}
@@ -332,7 +332,7 @@ function hbar(id,items,cfn){
   items.forEach(function(it){
     var pc=(it.v/mx)*100,co=typeof cfn==='function'?cfn(it):cfn;
     var ex=it.ex?'<span class="hb-o">'+it.ex+'</span>':'';
-    c.innerHTML+='<div class="hb-r"><div class="hb-l">'+it.n+'</div><div class="hb-t"><div class="hb-f" style="width:'+pc+'%;background:'+co+'"><span class="hb-v">'+it.lb+'</span></div></div>'+ex+'</div>';
+    c.innerHTML+='<div class="hb-r"><div class="hb-l">'+it.n+'</div><div class="hb-t"><div class="hb-f" style="width:'+pc+'%;background:'+co+'"></div></div><span class="hb-val">'+it.lb+'</span>'+ex+'</div>';
   });
 }
 
